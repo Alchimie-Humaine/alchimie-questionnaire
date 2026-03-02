@@ -51,6 +51,17 @@ button {padding:1rem 2rem;border:none;border-radius:12px;font-size:1.125rem;curs
 .btn-submit:hover {background:#2F6F73}
 .btn-restart {background:white;color:#0F4C4F;border:2px solid #E6D9C6;padding:1rem 2rem;border-radius:12px;font-size:1.125rem;cursor:pointer;font-family:Georgia,serif}
 .btn-restart:hover {background:#F4EFE8}
+.modal-overlay {position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,76,79,0.5);display:flex;align-items:center;justify-content:center;z-index:1000;padding:1.5rem}
+.modal-box {background:white;border-radius:16px;padding:2.5rem;max-width:480px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(15,76,79,0.25)}
+.modal-box h3 {font-size:1.5rem;color:#0F4C4F;font-weight:400;margin-bottom:1rem}
+.modal-box p {font-size:1.05rem;color:#3E2A1E;line-height:1.7;margin-bottom:2rem}
+.modal-btn {background:#0F4C4F;color:white;padding:0.875rem 2.5rem;border:none;border-radius:12px;font-size:1.125rem;cursor:pointer;font-family:Georgia,serif}
+.modal-btn:hover {background:#2F6F73}
+.thanks-card {background:white;border-radius:16px;padding:3.5rem 2.5rem;max-width:600px;margin:4rem auto;text-align:center;box-shadow:0 10px 40px rgba(15,76,79,0.15)}
+.thanks-card .icon {font-size:3rem;margin-bottom:1.5rem}
+.thanks-card h2 {font-size:2rem;color:#0F4C4F;font-weight:400;margin-bottom:2rem}
+.thanks-card p {font-size:1.125rem;line-height:1.8;color:#3E2A1E;margin-bottom:1.25rem}
+.thanks-card .signature {font-style:italic;color:#6B4A2F;font-size:1.125rem}
 </style>
 </head>
 <body>
@@ -71,6 +82,8 @@ let step=0;
 let ans={};
 let sc={A:0,B:0,C:0,D:0};
 let showRes=false;
+let showModal=false;
+let showThanks=false;
 let isRH=false;
 let otherTxt='';
 let competencesTxt='';
@@ -86,8 +99,35 @@ const mainQs=allQs.slice(0,11);
 // Questions profil C (q10_c, q11_c, q12_c, indices 11-13)
 const profilCQs=allQs.slice(11,14);
 
+function renderModal(){
+  return`<div class="modal-overlay">
+    <div class="modal-box">
+      <h3>✨ Vos réponses ont été enregistrées</h3>
+      <p>Merci pour votre confiance.<br>Regardez votre boîte mail, vous devriez recevoir très prochainement votre invitation à réserver un entretien.</p>
+      <button class="modal-btn" onclick="confirmModal()">OK</button>
+    </div>
+  </div>`;
+}
+
+function renderThanks(){
+  return`<div class="thanks-card">
+    <div class="icon">🌿</div>
+    <h2>Merci beaucoup !</h2>
+    <p>Merci beaucoup de nous avoir partagé vos réponses&nbsp;!</p>
+    <p>Vous avez normalement dû recevoir un email d'invitation à réserver un entretien.</p>
+    <p class="signature">Très belle continuation ✨</p>
+  </div>`;
+}
+
+function confirmModal(){
+  showModal=false;
+  showThanks=true;
+  render();
+}
+
 function render(){
-  document.getElementById('app').innerHTML=showRes?renderResult():renderQuestion();
+  const base=showThanks?renderThanks():showRes?renderResult():renderQuestion();
+  document.getElementById('app').innerHTML=base+(showModal?renderModal():'');
 }
 
 function renderQuestion(){
@@ -391,7 +431,8 @@ async function handleSubmit(){
     });
     
     if(response.ok){
-      alert('Merci ! Nous avons bien reçu vos informations.');
+      showModal=true;
+      render();
     }else{
       alert("Erreur lors de l'envoi. Veuillez réessayer.");
     }
